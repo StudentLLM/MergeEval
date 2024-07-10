@@ -1,2 +1,2 @@
 # MergeEval
-Merged model evaluation on MT-Bench, FLASK, and AlpacaEval
+Merged model evaluation on MT-Bench, arena-hard, FLASK, and AlpacaEval
