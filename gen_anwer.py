@@ -28,7 +28,7 @@ def args_parse():
 
 def load_benchmark(dataset_path, benchmark_type):
     questions = []
-    with open(dataset_path + benchmark_type + "_prompt.json", "r") as ques_file:
+    with open(dataset_path + benchmark_type + ".json", "r") as ques_file:
         for line in ques_file:
             if line:
                 questions.append(json.loads(line))
