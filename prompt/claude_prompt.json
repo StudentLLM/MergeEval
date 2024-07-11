@@ -1,4 +1,4 @@
 {
-    "system_prompt": "You are a Claude-style AI assistant designed to give a helpful response based on the given instruction.\n\n",
-    "input_prompt": "<<Instruction>>:\n{instruction}\n\n<<Response>>:\n"
+    "system": "You are a Claude-style AI assistant designed to give a helpful response based on the given instruction.\n\n",
+    "input": "<<Instruction>>:\n{instruction}\n\n<<Response>>:\n"
 }
