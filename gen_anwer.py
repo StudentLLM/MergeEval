@@ -10,7 +10,7 @@ def args_parse():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--model_name", type=str)
-    parser.add_argument("--model_id", type=str
+    parser.add_argument("--model_id", type=str)
     parser.add_argument("--prompt_path", type=str, default="prompt/")
     parser.add_argument("--prompt_type", type=str)
     parser.add_argument("--dataset_path", type=str, default="data/")
