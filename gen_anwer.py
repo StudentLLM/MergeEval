@@ -1,5 +1,6 @@
 from vllm import LLM, SamplingParams
 from datasets import load_dataset
+import os
 import json
 import torch
 import argparse
@@ -40,6 +41,8 @@ def load_template(prompt_path, prompt_type):
 
 def get_model_outputs(
     model_name,
+    model_id,
+    benchmark_type,
     questions,
     template,
     num_choices,
@@ -48,7 +51,8 @@ def get_model_outputs(
     max_tokens,
     min_tokens,
     top_p,
-    repetition_penalty
+    repetition_penalty,
+    output_path
 ):
     llm = LLM(
         model=model_name, 
@@ -65,69 +69,107 @@ def get_model_outputs(
         repetition_penalty=repetition_penalty
     )
 
+    outputs = []
     for question in tqdm(questions):
         choices = []
         for i in range(num_choices):
             torch.manual_seed(i)
             prompt = template["system"]
+
+            turns = []
             for j in range(len(question["turns"]:
                 q = question["turns"][j]
                 prompt += template["input"].format(instruction=q)
                 output = llm.generate(prompt, sampling_params)
                 prompt += output.outputs[0].text
-        
-        
+                turns.append(output)
+            choices.append({"index": i, "outputs": outputs})
+        outputs.append(choices)
 
-    outputs = model.generate(question_set, sampling_params)
-    return outputs
+        os.makedirs(output_path, exist_ok=True)
+        output_dir = "/".join([output_path, model_id, "(", benchmark_type, ")", "_result.json"])
+        with open(output_dir, "a") as fout:
+            ans_json = {
+                "model_id": model_id,
+                "category": question["category"],
+                "content": question["content"],
+                "choices": choices
+            }
+            json.dump(ans_json, fout, intent=4)
 
 def run_eval(
     model_name,
+    model_id,
     benchmark_type,
+    num_choices,
     dtype,
     temperature,
     max_tokens,
     min_tokens,
     top_p,
-    repitition_penalty
+    repetition_penalty,
+    output_path
 ):
     questions = load_benchmark(dataset_path, benchmark_type)
     template = load_template(prompt_path, prompt_type)
-    outputs = get_model_outputs(
-        model_name,
-        questions,
-        template,
-        dtype,
-        temperature,
-        max_tokens,
-        min_tokens,
-        top_p,
-        repetition_penalty
+
+    llm = LLM(
+        model=model_name, 
+        tensor_parallel_size=torch.cuda.device_count(),
+        trust_remote_code=True,
+        dtype=dtype
     )
-    return
+    
+    sampling_params = SamplingParams(
+        temperature=temperature,
+        max_tokens=max_tokens,
+        min_tokens=min_tokens,
+        top_p=top_p,
+        repetition_penalty=repetition_penalty
+    )
+
+    # generate outputs,.....
+    outputs = []
+    for question in tqdm(questions):
+        choices = []
+        for i in range(num_choices):
+            torch.manual_seed(i)
+            prompt = template["system"]
+
+            turns = []
+            for j in range(len(question["turns"]:
+                q = question["turns"][j]
+                prompt += template["input"].format(instruction=q)
+                output = llm.generate(prompt, sampling_params)
+                prompt += output.outputs[0].text
+                turns.append(output)
+            choices.append({"index": i, "outputs": outputs})
+        outputs.append(choices)
+
+        os.makedirs(output_path, exist_ok=True)
+        output_dir = "/".join([output_path, model_id, "(", benchmark_type, ")", "_result.json"])
+        with open(output_dir, "a") as fout:
+            ans_json = {
+                "model_id": model_id,
+                "category": question["category"],
+                "content": question["content"],
+                "choices": choices
+            }
+            json.dump(ans_json, fout, intent=4)
 
 if __name__ == "__main__":
     args = args_parse()
 
     run_eval(
         args.model_name,
+        args.model_id,
         args.benchmark_type,
+        args.num_choices,
         args.dtype,
         args.temperature,
         args.max_tokens,
         args.min_tokens,
         args.top_p,
-        args.repetition_penalty
+        args.repetition_penalty,
+        args.output_path
     )
-
-    result_dataset = {
-        "prompt": [],
-        "output": []
-    }
-    
-    for output in outputs:
-        result_dataset["prompt"].append(output.prompt)
-        result_dataset["output"].append(output.outputs[0].text)
-        
-    with open("/".join([args.output_path, args.model_id + "_result.json"]), "w") as f:
-        json.dump(result_dataset, f, indent=4)
