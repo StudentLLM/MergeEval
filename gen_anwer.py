@@ -3,6 +3,7 @@ from datasets import load_dataset
 import json
 import torch
 import argparse
+from tqdm import tqdm
 
 def args_parse():
     parser = argparse.ArgumentParser()
@@ -22,19 +23,20 @@ def args_parse():
     
     return parser.parse_args()
 
-def load_benchmark():
+def load_benchmark(benchmark_type):
     questions = []
     with open("", "r") as ques_file:
         for line in ques_file:
             if line:
                 questions.append(json.loads(line))
-    return
+    return questions
 
 def get_prompt():
     return
 
-def get_model_output(
-    model_name
+def get_model_outputs(
+    model_name,
+    questions,
     dtype,
     temperature,
     max_tokens,
@@ -42,31 +44,63 @@ def get_model_output(
     top_p,
     repetition_penalty
 ):
-    llm = LLM(
+    model = LLM(
         model=model_name, 
         tensor_parallel_size=torch.cuda.device_count(),
         trust_remote_code=True,
-        dtype="bfloat16"
+        dtype=dtype
     )
     
     sampling_params = SamplingParams(
-        temperature=0.7,
-        max_tokens=2048,
-        min_tokens=50,
-        top_p=1.0,
-        repetition_penalty=1.03
+        temperature=temperature,
+        max_tokens=max_tokens,
+        min_tokens=min_tokens,
+        top_p=top_p,
+        repetition_penalty=repetition_penalty
     )
 
-    outputs = llm.generate(question_set, sampling_params)
+    for question in tqdm(questions):
+        
+
+    outputs = model.generate(question_set, sampling_params)
     return outputs
 
-def run_eval():
+def run_eval(
+    model_name,
+    benchmark_type,
+    dtype,
+    temperature,
+    max_tokens,
+    min_tokens,
+    top_p,
+    repitition_penalty
+):
+    questions = load_benchmark(benchmark_type)
+    outputs = get_model_outputs(
+        model_name,
+        questions,
+        dtype,
+        temperature,
+        max_tokens,
+        min_tokens,
+        top_p,
+        repetition_penalty
+    )
     return
 
 if __name__ == "__main__":
     args = args_parse()
 
-
+    run_eval(
+        args.model_name,
+        args.benchmark_type,
+        args.dtype,
+        args.temperature,
+        args.max_tokens,
+        args.min_tokens,
+        args.top_p,
+        args.repetition_penalty
+    )
 
     result_dataset = {
         "prompt": [],
