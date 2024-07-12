@@ -138,7 +138,7 @@ def run_eval(
         "output": outputs[i]
     } for i, question in enumerate(questions)]
     
-    with open("/".join([output_path, model_id, "(", benchmark_type, ")", "_result.json"]), "w") as f:
+    with open("/".join([output_path, model_id, "_", benchmark_type, "_result.json"]), "w") as f:
         json.dump(ans_json, f, indent=4)
 
 if __name__ == "__main__":
