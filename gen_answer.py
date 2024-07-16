@@ -85,24 +85,6 @@ def get_model_outputs(args, questions, template):
             "output": [gen[i] for gen in generations]
         }
         outputs.append(output_format)
-
-    # prompt_1 = [template["system"] + template["input"].format(instruction=ques["content"][0]) for ques in questions]
-    # generation = llm.generate(prompt_1, sampling_params)
-    # output_1 = [output.outputs[0].text for output in generation]
-    # prompt_2 = [pm_1 + op_1 + "\n\n" + template["input"].format(instruction=ques["content"][1]) for pm_1, op_1, ques in zip(prompt_1, output_1, questions)]
-    # generation = llm.generate(prompt_2, sampling_params)
-    # output_2 = [output.outputs[0].text for output in generation]
-
-    # for pm_1, op_1, pm_2, op_2 in zip(prompt_1, output_1, prompt_2, output_2):
-    #     output_format = {
-    #         "model": args.model_id,
-    #         "benchmark": "mt-bench",
-    #         "turn_1_prompt": pm_1,
-    #         "turn_1_output": op_1,
-    #         "turn_2_prompt": pm_2,
-    #         "turn_2_output": op_2
-    #     }
-    #     outputs.append(output_format)
     
     return outputs
 
