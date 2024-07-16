@@ -55,7 +55,6 @@ def get_model_outputs(args, questions, template):
         repetition_penalty=args.repetition_penalty
     )
 
-    # 지금은 1st turn 하나 생성하고 바로 이어서 2nd turn 생성
     prompts = []
     generations = []
 
