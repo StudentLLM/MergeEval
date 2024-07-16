@@ -80,6 +80,7 @@ def get_model_outputs(args, questions, template):
         output_format = {
             "model": args.model_id,
             "benchmark": args.benchmark_type,
+            "template": args.prompt_type
             "input": [pm[i] for pm in prompts],
             "output": [gen[i] for gen in generations]
         }
