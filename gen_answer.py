@@ -1,6 +1,5 @@
 from vllm import LLM, SamplingParams
 from datasets import load_dataset
-import numpy as np
 import os
 import json
 import torch
@@ -60,22 +59,24 @@ def get_model_outputs(args, questions, template):
     prompts = []
     generations = []
 
-    for i in range(len(questions[0]["content"])):
+    num_turns = questions[0]["content"]
+    for i in range(len(num_turns)):
         prompt = []
         for j, qs in enumerate(questions):
-            if i is 0:
+            if i == 0:
                 p = template["system"] + template["input"].format(instruction=qs["content"][i])
             else:
                 p = prompts[i-1][j] + generations[i-1][j] + "\n\n" + template["input"].format(instruction=qs["content"][i])
             prompt.append(p)
         gen = llm.generate(prompt, sampling_params)
-
+        gen = [g.outputs[0].text for g in gen]
+        
         prompts.append(prompt)
         generations.append(gen)
 
     outputs = []
 
-    for i in range(len(prompts[0])):
+    for i in range(len(questions)):
         output_format = {
             "model": args.model_id,
             "benchmark": args.benchmark_type,
@@ -112,9 +113,10 @@ def run_eval(args):
         questions,
         template
     )
-    
-    with open(args.output_path + args.model_id + "_result.json", "w") as f:
-        json.dump(outputs, f, indent=4)
+
+    os.makedirs(args.output_path, exist_ok=True)
+    with open(args.output_path + args.model_id + "_" + args.benchmark_type + "_result.json", "w") as f:
+        json.dump(outputs, f, default=str, indent=4)
 
 if __name__ == "__main__":
     args = args_parse()
