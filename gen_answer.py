@@ -55,8 +55,8 @@ def get_model_outputs(args, questions, template):
         repetition_penalty=args.repetition_penalty
     )
 
-    prompts = []
-    generations = []
+    prompts = []    # [[1st turn prompts], [2st turn prompts]]
+    generations = []    # [[1st turn outputs], [2st turn outputs]]
 
     num_turns = questions[0]["content"]
     for i in range(len(num_turns)):
