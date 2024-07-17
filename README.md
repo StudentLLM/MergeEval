@@ -10,8 +10,8 @@ pip install -r requirements.txt
 ## Run
 ```
 python gen_answer.py \
-  --model_name MODEL_CARD \
-  --model_id MODEL_ID \
-  --prompt_type PROMPT_TYPE \
-  --benchmark_type BENCHMARK_TYPE
+    --model_name MODEL_CARD \
+    --model_id MODEL_ID \
+    --prompt_type PROMPT_TYPE \
+    --benchmark_type BENCHMARK_TYPE
 ```
